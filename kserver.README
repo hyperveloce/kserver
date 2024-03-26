@@ -1,0 +1,3 @@
+setterm -blank 10           # Blank the screen in 10 minutes
+setterm -powersave on       # Put the monitor into VESA power saving mode
+setterm -powerdown 20       # Set the VESA powerdown to 20 minutes
