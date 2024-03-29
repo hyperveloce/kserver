@@ -1,3 +1,24 @@
 setterm -blank 10           # Blank the screen in 10 minutes
 setterm -powersave on       # Put the monitor into VESA power saving mode
 setterm -powerdown 20       # Set the VESA powerdown to 20 minutes
+
+
+
+# casaos - https://get.casaos.io/
+curl -fsSL https://get.casaos.io/ | sudo bash
+
+#suspend sleep
+
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+#re-enable sleep
+sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+
+etc/host
+
+
+
+Samba share on fedora
+
+https://www.incredigeek.com/home/how-to-setup-samba-cifs-share-on-fedora-server
