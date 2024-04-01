@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    hostname: homepage
+    container_name: homepage
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    ports:
+      - 3000:3000
+    volumes:
+      - ${USERDIR}/homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock

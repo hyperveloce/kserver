@@ -1,28 +1,45 @@
-#suspend sleep
-setterm -blank 10           # Blank the screen in 10 minutes
-setterm -powersave on       # Put the monitor into VESA power saving mode
-setterm -powerdown 20       # Set the VESA powerdown to 20 minutes
 
-UUID=5e392438-fec5-4faf-b41a-21489704070d /mnt/kserver.system ext4 rw,user,nofail 0 0
 
+#monitor off
+Edit /etc/default/grub
+Find the line with GRUB_CMDLINE_LINUX="foo=bar"
+Add the parameter: GRUB_CMDLINE_LINUX="consoleblank=60 foo=bar"
+Run sudo update-grub
+
+###Move home directory --
+
+lsblk -f
+sudo vim /etc/fstab
+UUID=1934d250-44a9-4860-90e8-367a33eb3fbd /mnt/kserver.system ext4 rw,user,nofail 0 0
 //192.168.50.2/k_media /media/asus87u/k_media cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
 //192.168.50.2/k_Cinema /media/asus87u/k_Cinema cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
 //192.168.50.1/backup /media/asusax6000/backup cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
 
-https://technotim.live/posts/homepage-dashboard/#configure
+sudo mkdir -R /media/asus87u/k_media
+sudo mkdir -R /media/asus87u/k_Cinema
+sudo mkdir -R /media/asusax6000/backup
+sudo mkdir /mnt/kserver.system
+systemctl daemon-reload
+
 
 #suspend sleep
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-
 #re-enable sleep
 sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
+sudo vim /etc/environment
+PUID=????
+PGID=????
+TZ="Australia/Melbourne"
+USERDIR="/home/kanasu/kserver
 
-etc/host
+sudo vim /etc/host
 
 
 MUST Install
 Homepage
+https://technotim.live/posts/homepage-dashboard/#configure
+
 duplicati
 syncthing
 AdGuard

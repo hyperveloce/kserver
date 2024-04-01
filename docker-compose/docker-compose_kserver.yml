@@ -145,7 +145,80 @@ services:
 # secrets:
 #   gitlab_root_password:
 #     file: ./root_password.txt
+        # duplicati:
+  #   container_name: duplicati
+  #   hostname: duplicati
+  #   restart: always
+  #   image: lscr.io/linuxserver/duplicati:latest
+  #   ports:
+  #     - 8000:8000
+  #   environment:
+      # - PUID=${PUID}
+      # - PGID=${PGID}
+      # - TZ=${TZ}
+  #     - CLI_ARGS= #optional
+  #   volumes:
+  #     - ${USERDIR}/duplicati//appdata/config:/config
+  #     - ${USERDIR}/duplicati/backups:/backups
+  #     - ${USERDIR}/duplicati/source:/source
+  #   ports:
+  #     - 8200:8200
 
+
+# # Syncthing
+#   syncthing:
+#     container_name: syncthing
+#     restart: always
+#     image: linuxserver/syncthing
+#     volumes:
+#       - /home/pi/docker/syncthing:/config
+#       - /home/pi/syncthing-data:/mnt/data
+#       - /mnt/USBHDD1/downloads/m-complete:/mnt/USBHDD1/downloads/m-complete
+#       - /mnt/USBHDD1/downloads/s-complete:/mnt/USBHDD1/downloads/s-complete
+#       - /home/pi/asusac87/movies/latest:/mnt/asusac87/movies/latest
+#       - /home/pi/asusac87/shows/latest:/mnt/asusac87/shows/k_Series/latest
+#     ports:
+#       - "8384:8384"
+#       - "22000:22000"
+#       - "21027:21027/udp"
+#     environment:
+#       - PUID=${PUID}
+#       - PGID=${PGID}
+#       - UMASK_SET=002
+#       - TZ=${TZ}
+
+######### UTILITIES ##########
+
+# # MariaDB – Database Server for your Apps
+#   mariadb:
+#     image: "linuxserver/mariadb"
+#     container_name: "mariadb"
+#     volumes:
+#       - /${USERDIR}/docker/mariadb:/config
+#     environment:
+#       - MARIADB_ROOT_PASSWORD=password
+#       - MARIADB_USER=user
+#       - MARIADB_PASSWORD=password
+#       - MARIADB_DATABASE=mariadb
+#     ports:
+#       - "3306:3306"
+#     restart: always
+#
+# # NextCloud – Your Own Cloud Storage
+#   nextcloud:
+#     container_name: nextcloud
+#    hostname: nextcloud
+#     restart: always
+#     image: linuxserver/nextcloud
+#     volumes:
+#       - /${USERDIR}/docker/nextcloud:/config
+#       - /${USERDIR}/shared_data:/data
+#       - /${USERDIR}/docker/shared:/shared
+#     ports:
+#       - "443:443"
+#     environment:
+#       - PUID=${PUID}
+#       - PGID=${PGID}
 volumes:
   nextcloud:
   db:

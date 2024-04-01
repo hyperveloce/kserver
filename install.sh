@@ -27,7 +27,7 @@ builddir=$(pwd)
 #ls -larth /mnt/home/kanasu
 
 # System updates
-sudo apt -y update && sudo apt -y upgrade && sudo apt -y dist-upgrade
+sudo apt update && sudo apt upgrade
 
 # Making .config and Moving config files and background to Pictures
 cd $builddir
