@@ -6,11 +6,64 @@ services:
     container_name: homepage
     restart: always
     environment:
-      - PUID=${PUID}
+      - PUID=1000
       - PGID=${PGID}
       - TZ=${TZ}
     ports:
       - 80:3000
     volumes:
       - ${USERDIR}/homepage/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    hostname: dozzle
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9090:8080
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${USERDIR}/syncthing/config:/config
+      - ${USERDIR}/data1:/data1
+      - ${USERDIR}/data2:/data2
+    ports:
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    restart: unless-stopped
+  iperf:
+    container_name: iperf
+    image: networkstatic/iperf3
+    command: -s
+    restart: unless-stopped
+    network_mode: host
+
+  netdata:
+    container_name: netdata
+    image: titpetric/netdata
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+    network_mode: host
+    environment:
+      - TZ=Europe/Bucharest
+      #- PUID=1000
+      #- PGID=1000
+    volumes:
+      - /opt/config/netdata:/etc/netdata
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
       - /var/run/docker.sock:/var/run/docker.sock

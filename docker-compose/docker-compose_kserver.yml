@@ -1,224 +1,85 @@
-version: '3.0'
+version: "3.3"
 services:
-
-######### CloudStorage ##########
-  dozzle:
-    container_name: dozzle
-    image: amir20/dozzle:latest
-    hostname: dozzle
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 9090:8080
 
   nextcloud:
     container_name: nextcloud
     image: nextcloud
+    container_name: nextcloud
+    hostname: nextcloud
     restart: always
     links:
-      - db
-      - redis
+      - ncmariadb
+      - ncredis
     depends_on:
-      - db
-      - redis
+      - ncmariadb
+      - ncredis
     volumes:
-      - ${USERDIR}/docker/nextcloud/config:/var/www/html/config
-      - ${USERDIR}/docker/nextcloud/db:/var/lib/mysql
-      - ${USERDIR}/docker/nextcloud/data:/var/www/html/data
+      - ${USERDIR}/nextcloud/config:/config
+      - ${USERDIR}/nextcloud/apps:/apps2
+      - ${USERDIR}/nextcloud/themes:/nextcloud/themes
     environment:
-      - MYSQL_PASSWORD=
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_HOST=db
-      - REDIS_HOST=redis
+      - PUID=1000
+      - PGID=${PGID}
+      - UPLOAD_MAX_SIZE=2G
+      - APC_SHM_SIZE=128M
+      - OPCACHE_MEM_SIZE=128
+      - CRON_PERIOD=15m
+      - TZ=${TZ}
+      - ADMIN_USER=            # Don't set to configure through browser
+      - ADMIN_PASSWORD=        # Don't set to configure through browser
+      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_DATABASE=ncmariadb
+      - MYSQL_USER=kanasu
+      - MYSQL_HOST=ncmariadb
+      - REDIS_HOST=ncredis
       - REDIS_PORT=6379
       - 'REDIS_HOST_PASSWORD=nextcloud_redis_pass'
     ports:
-      - 80:80
-
-  redis:
+      - 82:80
+  ncredis:
     image: redis:alpine
+    container_name: ncredis
+    hostname: ncredis
     ports:
       - "6379:6379"
     command: redis-server --requirepass nextcloud_redis_pass
     restart: unless-stopped
-
-  db:
+  ncmariadb:
     image: mariadb
-    container_name: db
+    container_name: ncmariadb
+    hostname: ncmariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
-      - PUID=${PUID}
+      - PUID=1000
       - PGID=${PGID}
       - TZ=${TZ}
       - MYSQL_ROOT_PASSWORD=nextcloud
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=nextcloud
+      - MYSQL_DATABASE=ncmariadb
+      - MYSQL_USER=kanasu
       - MYSQL_PASSWORD=nextcloud
-      #192.168.50.201:3306
     ports:
       - 3306:3306
     volumes:
-      - ${USERDIR}/docker/MariaDB/config:/var/www/html/config
-      - ${USERDIR}/docker/MariaDB/db:/var/lib/mysql:rw
-      - ${USERDIR}/docker/MariaDB/data:/var/www/html/data:rw
+      - ${USERDIR}/nexcloudmariaDB/data:/var/www/html/config
+      - ${USERDIR}/nexcloudmariaDB/data:/var/lib/mysql:rw
+      - ${USERDIR}/nexcloudmariaDB/data:/var/www/html/data:rw
     restart: unless-stopped
 
   duplicati:
     image: lscr.io/linuxserver/duplicati:latest
     container_name: duplicati
     environment:
-      - PUID=${PUID}
+      - PUID=1000
       - PGID=${PGID}
       - TZ=${TZ}
       - CLI_ARGS= #optional
     volumes:
-      - ${USERDIR}/docker/duplicati/appdata/config:/config
-      - ${USERDIR}/docker/duplicati/backups:/backups
-      - ${USERDIR}/docker/duplicati/source:/source
+      - ${USERDIR}/duplicati/appdata/config:/config
+      - ${USERDIR}/duplicati/backups:/backups
+      - ${USERDIR}/duplicati/source:/source
     ports:
       - 8200:8200
     restart: unless-stopped
 
-  homeassistant:
-    container_name: homeassistant
-    image: homeassistant/home-assistant:latest
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${USERDIR}/docker/home-assistant/config:/config
-    ports:
-      - 8123:8123
-    restart: unless-stopped
-    privileged: true
-    depends_on:
-      - db
-
-  # syncthing:
-  #   image: syncthing/syncthing
-  #   container_name: syncthing
-  #   environment:
-      # - PUID=${PUID}
-      # - PGID=${PGID}
-      # - TZ=${TZ}
-  #   volumes:
-  #     - ${USERDIR}/docker/syncthing:/var/syncthing
-  #   ports:
-  #     - 8384:8384 # Web UI
-  #     - 22000:22000/tcp # TCP file transfers
-  #     - 22000:22000/udp # QUIC file transfers
-  #     - 21027:21027/udp # Receive local discovery broadcasts
-  #   restart: unless-stopped
-
-#   gitlab:
-#     image: gitlab/gitlab-ee:latest
-#     ports:
-#       - "22:22"
-#       - "80:80"
-#       - "443:443"
-#     volumes:
-#       - $GITLAB_HOME/data:/var/opt/gitlab
-#       - $GITLAB_HOME/logs:/var/log/gitlab
-#       - $GITLAB_HOME/config:/etc/gitlab
-#     shm_size: '256m'
-#     environment:
-#       GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
-#     configs:
-#       - source: gitlab
-#         target: /omnibus_config.rb
-#     secrets:
-#       - gitlab_root_password
-#   gitlab-runner:
-#     image: gitlab/gitlab-runner:alpine
-#     deploy:
-#       mode: replicated
-#       replicas: 4
-# configs:
-#   gitlab:
-#     file: ./gitlab.rb
-# secrets:
-#   gitlab_root_password:
-#     file: ./root_password.txt
-        # duplicati:
-  #   container_name: duplicati
-  #   hostname: duplicati
-  #   restart: always
-  #   image: lscr.io/linuxserver/duplicati:latest
-  #   ports:
-  #     - 8000:8000
-  #   environment:
-      # - PUID=${PUID}
-      # - PGID=${PGID}
-      # - TZ=${TZ}
-  #     - CLI_ARGS= #optional
-  #   volumes:
-  #     - ${USERDIR}/duplicati//appdata/config:/config
-  #     - ${USERDIR}/duplicati/backups:/backups
-  #     - ${USERDIR}/duplicati/source:/source
-  #   ports:
-  #     - 8200:8200
-
-
-# # Syncthing
-#   syncthing:
-#     container_name: syncthing
-#     restart: always
-#     image: linuxserver/syncthing
-#     volumes:
-#       - /home/pi/docker/syncthing:/config
-#       - /home/pi/syncthing-data:/mnt/data
-#       - /mnt/USBHDD1/downloads/m-complete:/mnt/USBHDD1/downloads/m-complete
-#       - /mnt/USBHDD1/downloads/s-complete:/mnt/USBHDD1/downloads/s-complete
-#       - /home/pi/asusac87/movies/latest:/mnt/asusac87/movies/latest
-#       - /home/pi/asusac87/shows/latest:/mnt/asusac87/shows/k_Series/latest
-#     ports:
-#       - "8384:8384"
-#       - "22000:22000"
-#       - "21027:21027/udp"
-#     environment:
-#       - PUID=${PUID}
-#       - PGID=${PGID}
-#       - UMASK_SET=002
-#       - TZ=${TZ}
-
-######### UTILITIES ##########
-
-# # MariaDB – Database Server for your Apps
-#   mariadb:
-#     image: "linuxserver/mariadb"
-#     container_name: "mariadb"
-#     volumes:
-#       - /${USERDIR}/docker/mariadb:/config
-#     environment:
-#       - MARIADB_ROOT_PASSWORD=password
-#       - MARIADB_USER=user
-#       - MARIADB_PASSWORD=password
-#       - MARIADB_DATABASE=mariadb
-#     ports:
-#       - "3306:3306"
-#     restart: always
-#
-# # NextCloud – Your Own Cloud Storage
-#   nextcloud:
-#     container_name: nextcloud
-#    hostname: nextcloud
-#     restart: always
-#     image: linuxserver/nextcloud
-#     volumes:
-#       - /${USERDIR}/docker/nextcloud:/config
-#       - /${USERDIR}/shared_data:/data
-#       - /${USERDIR}/docker/shared:/shared
-#     ports:
-#       - "443:443"
-#     environment:
-#       - PUID=${PUID}
-#       - PGID=${PGID}
-volumes:
-  nextcloud:
-  db:
+  # homeassistant:
+# https://iotechonline.com/home-assistant-install-with-docker-compose/
