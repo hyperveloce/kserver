@@ -52,7 +52,6 @@ services:
     restart: unless-stopped
     ports:
       - 5201:5201
-    network_mode: host
 
   netdata:
     container_name: netdata
@@ -60,7 +59,6 @@ services:
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
-    network_mode: host
     environment:
       - TZ=Europe/Bucharest
       #- PUID=1000
