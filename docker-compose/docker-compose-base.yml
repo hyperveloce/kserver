@@ -44,11 +44,14 @@ services:
       - 22000:22000/udp
       - 21027:21027/udp
     restart: unless-stopped
+
   iperf:
     container_name: iperf
     image: networkstatic/iperf3
     command: -s
     restart: unless-stopped
+    ports:
+      - 5201:5201
     network_mode: host
 
   netdata:
@@ -62,6 +65,8 @@ services:
       - TZ=Europe/Bucharest
       #- PUID=1000
       #- PGID=1000
+    ports:
+    - 19999:19999
     volumes:
       - /opt/config/netdata:/etc/netdata
       - /proc:/host/proc:ro
