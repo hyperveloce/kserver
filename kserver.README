@@ -1,14 +1,17 @@
+#suspend sleep
 setterm -blank 10           # Blank the screen in 10 minutes
 setterm -powersave on       # Put the monitor into VESA power saving mode
 setterm -powerdown 20       # Set the VESA powerdown to 20 minutes
 
+UUID=5e392438-fec5-4faf-b41a-21489704070d /mnt/kserver.system ext4 rw,user,nofail 0 0
 
+//192.168.50.2/k_media /media/asus87u/k_media cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
+//192.168.50.2/k_Cinema /media/asus87u/k_Cinema cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
+//192.168.50.1/backup /media/asusax6000/backup cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
 
-# casaos - https://get.casaos.io/
-curl -fsSL https://get.casaos.io/ | sudo bash
+https://technotim.live/posts/homepage-dashboard/#configure
 
 #suspend sleep
-
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
 #re-enable sleep
@@ -18,7 +21,64 @@ sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.
 etc/host
 
 
+MUST Install
+Homepage
+duplicati
+syncthing
+AdGuard
+homeassistant
+nextcloud
+PhotoPrism
+2FAuth
+Grafana
+Prometheus
+Shinobi
 
-Samba share on fedora
+OPNSense
+Pi-hole
+malTrail
+Ntopng
+monit
+PiAlert
+HealthChecks
+LibreSpeed
+StatPing
+NetData
+ArchiveBox
+Wallabag
+Node-REDIS_HOSTZigbee 2 mqtt
+vault-warden
+Wiki?
+https://github.com/lus/pasty
+https://searx.thegpm.org/
+https://www.pufferpanel.com/
 
-https://www.incredigeek.com/home/how-to-setup-samba-cifs-share-on-fedora-server
+
+
+Headphones - manage your music.
+MadSonic - stream your music collection.
+Calibre - eBook server
+Muximux - lightweight portal to manage your webapps.
+Organizr - Another feature-packed lightweight portal to manage your webapps.
+Game servers - Host a Minecraft server to play privately with friends or because you enjoy playing god.
+Tautulli - tons of stats for your Plex server's usage. (Formally PlexPy)
+Mylar - manage your comic books.
+NZBHydra - NZB Indexer aggregator, similar in form to Jackett.
+Veeam - Learn Veeam to backup your VMs
+Networking --
+GNS3
+pfSense
+OPNsense
+Pi-hole
+Network Monitor
+OpenVPN
+VyOS
+IPFire
+Monitoring --
+Splunk - data analytics and logging, including a SYSLOG server
+Syslog - log collation built into *nix to feed Splunk (or other Security Information Event Manager)
+Security Software
+Snort - intrusion prevention software (IPS)
+Infrastructure Tools
+Chef, Puppet, or Ansible - server configuration and deployment managers, heavily used in data centers
+**** Guacamole clientless remote gateway to access your server from elsewhere
