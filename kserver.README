@@ -11,16 +11,21 @@ Run sudo update-grub
 lsblk -f
 sudo vim /etc/fstab
 UUID=1934d250-44a9-4860-90e8-367a33eb3fbd /mnt/kserver.system ext4 rw,user,nofail 0 0
-//192.168.50.2/k_media /media/asus87u/k_media cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
-//192.168.50.2/k_Cinema /media/asus87u/k_Cinema cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
-//192.168.50.1/backup /media/asusax6000/backup cifs vers=1.0,username=Kanasu,password=Serena2106!,domain=WORKGROUP 0 0
 
-sudo mkdir -R /media/asus87u/k_media
-sudo mkdir -R /media/asus87u/k_Cinema
-sudo mkdir -R /media/asusax6000/backup
+//192.168.50.2/k_media /media/asus87u/k_media cifs vers=1.0,username=Kanasu,password==$$$$$,domain=WORKGROUP 0 0
+//192.168.50.2/k_Cinema /media/asus87u/k_Cinema cifs vers=1.0,username=Kanasu,password=$$$$$,domain=WORKGROUP 0 0
+//192.168.50.1/backup /media/asusax6000/backup cifs vers=1.0,username=Kanasu,password==$$$$$,domain=WORKGROUP 0 0
+//192.168.50.201/kserver-home /media/kserver/kserver-home cifs username=Kanasu,password==$$$$$,domain=WORKGROUP 0 0
+
+sudo mkdir -p /media/asus87u/k_media;
+sudo mkdir -p /media/asus87u/k_Cinema;
+sudo mkdir -p /media/asusax6000/backup;
+sudo mkdir -p /media/kserver/kserver-home;
+
 sudo mkdir /mnt/kserver.system
 systemctl daemon-reload
 
+SMBsetup --https://www.zdnet.com/article/how-to-share-folders-to-your-network-from-linux/
 
 #suspend sleep
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target

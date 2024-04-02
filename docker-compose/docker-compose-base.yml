@@ -51,7 +51,9 @@ services:
     command: -s
     restart: unless-stopped
     ports:
-      - 5201:5201
+      - "50001:5001/tcp"
+      - "50001:5001/udp"
+    command: iperf3 -s -V -d -p 5001
 
   netdata:
     container_name: netdata
