@@ -1,3 +1,42 @@
-https://github.com/lawtancool/shinobi-docker-yolo
+#https://github.com/lawtancool/shinobi-docker-yolo
 
-https://docs.shinobi.video/installation/docker
+#https://docs.shinobi.video/installation/docker
+
+version: "3.3"
+services:
+  shinobi-core:
+    image: migoller/shinobidocker:microservice-debian
+    container_name: shinobi-core
+    env_file:
+      - MySQL.env
+      - Shinobi.env
+    depends_on:
+      - shinobi-mariadb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ${USERDIR}/shinobi/config:/config
+      - /mnt/disks/CCTV:/opt/shinobi/videos
+      - /dev/shm/shinobiDockerTemp:/dev/shm/streams
+    expose:
+      - "8085"
+
+  shinobi-mariadb:
+    image: mariadb
+    container_name: shinobi-mariadb
+    env_file:
+      - MySQL.env
+    command: [
+        '--wait_timeout=28800',
+    ]
+    volumes:
+      - ${USERDIR}/shinobi/mysql:/var/lib/mysql
+
+  # shinobi-yolo:
+  #   image: lawtancool/shinobi-docker-yolo
+  #   container_name: shinobi-yolo
+  #   runtime: nvidia
+  #   depends_on:
+  #     - shinobi-core
+  #   volumes:
+  #     - ${USERDIR}/shinobi/yoloConfig/conf.json:/src/plugins/yolo/conf.json

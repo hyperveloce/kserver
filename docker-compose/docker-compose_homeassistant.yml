@@ -1,0 +1,79 @@
+version: "3.3"
+services:
+  # HomeAssistant
+  homeassistant:
+    container_name: home-assistant
+    image: homeassistant/home-assistant:latest
+    volumes:
+      # Local path where your home assistant config will be stored
+      - ${USERDIR}/home-assistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    depends_on:
+      - mariadb # MariaDB is optional (only if you would like to use a different database for HA).
+      - zigbee2mqtt  # zigbee2mqtt is optional (only if you want to add Zigbee devices and have a zigbee sniffer attached).
+      - eclipse-mosquitto # aka mosquitto-mqtt is optional (only if you want to add Zigbee devices and have a zigbee sniffer attached).
+      - nodered
+
+  # MariaDb
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: ha_db
+      MYSQL_USER: homeassistant
+      MYSQL_PASSWORD: "${HA_MYSQL_PASSWORD}"
+    user: "${LOCAL_USER}:${LOCAL_USER}"
+    volumes:
+      # Local path where the database will be stored.
+      - ./store/mariadb:/var/lib/mysql
+
+  # eclipse-mosquitto (MQTT broker)
+  eclipse-mosquitto:
+    container_name: eclipse-mosquitto
+    image: eclipse-mosquitto:latest
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${USERDIR}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  # nodered
+  nodered:
+    container_name: nodered
+    image: nodered/node-red
+    ports:
+      - "1880:1880"
+    volumes:
+      - ${USERDIR}/nodered:/data
+    depends_on:
+      - homeassistant
+      - mosquitto
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: unless-stopped
+
+
+  # # zigbee2mqtt
+  # zigbee2mqtt:
+  #   container_name: zigbee2mqtt
+  #   image: koenkk/zigbee2mqtt:latest
+  #   restart: unless-stopped
+  #   network_mode: host
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #   volumes:
+  #     - ${USERDIR}/zigbee2mqtt:/app/data
+  #     - /run/udev:/run/udev:ro
+  #   devices:
+  #     - "${ZIGBEE_ADAPTER_TTY}:/dev/ttyZigbee"
+  #   privileged: true
+
+  # homeassistant:
+# https://iotechonline.com/home-assistant-install-with-docker-compose/
+#https://github.com/codingPear/home-assistant-docker-compose/blob/master/docker-compose.yaml

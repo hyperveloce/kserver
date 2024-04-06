@@ -1,0 +1,79 @@
+version: "3.3"
+services:
+  cloudflared:
+    hostname: cloudflared
+    container_name: cloudflared
+    image: cloudflare/cloudflared:latest
+    restart: 'always'
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${USERDIR}/cloudflared/:/home/nonroot/.cloudflared/
+
+  adguard:
+    hostname: adguard
+    container_name: adguard
+    image: adguard/adguardhome:latest
+    user: '99'
+    #logging:
+    #    driver: none
+    volumes:
+      - ${USERDIR}/adguard:/opt/adguardhome/conf
+    ports:
+      - 53:5353/tcp
+      - 53:5353/udp
+      - 8088:8080
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: 'always'
+
+  vaultwarden-backup:
+    image: ttionya/vaultwarden-backup:latest
+    container_name: vaultwarden-backup
+    hostname: vaultwarden-backup
+    restart: always
+    environment:
+      CRON: '00 03 * * *'
+      ZIP_ENABLE: 'TRUE'
+      ZIP_PASSWORD: 'PASSWORD'
+      ZIP_TYPE: 'zip'
+      BACKUP_KEEP_DAYS: 30
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+      volumes:
+      - ${USERDIR}/bw-data:/bitwarden/data/
+      - ${USERDIR}/vaultwarden-backup/:/config/
+
+  vaultwarden:
+    container_name: vaultwarden
+    hostname: vaultwarden
+    image: vaultwarden/server:latest
+    restart: unless-stopped
+    volumes:
+      - ${USERDIR}/vaultwarden/data/:/data/
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    ports:
+      - 1080:80
+
+  # tailscale:
+  #   container_name: tailscale
+  #   volumes:
+  #     - '/var/lib:/var/lib'
+  #     - '/dev/net/tun:/dev/net/tun'
+  #   network_mode: host
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #   privileged: true
+  #   image: tailscale/tailscale
+    entrypoint: tailscaled

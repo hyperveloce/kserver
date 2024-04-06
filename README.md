@@ -45,16 +45,9 @@ MUST Install
 Homepage
 https://technotim.live/posts/homepage-dashboard/#configure
 
-duplicati
-syncthing
-AdGuard
-homeassistant
-nextcloud
-PhotoPrism
 2FAuth
 Grafana
 Prometheus
-Shinobi
 
 OPNSense
 Pi-hole
@@ -62,13 +55,11 @@ malTrail
 Ntopng
 monit
 PiAlert
-HealthChecks
 LibreSpeed
 StatPing
 NetData
 ArchiveBox
 Wallabag
-Node-REDIS_HOSTZigbee 2 mqtt
 vault-warden
 Wiki?
 https://github.com/lus/pasty

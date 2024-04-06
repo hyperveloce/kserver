@@ -1,6 +1,5 @@
 version: "3.3"
 services:
-
   nextcloud:
     container_name: nextcloud
     image: nextcloud
@@ -64,22 +63,3 @@ services:
       - ${USERDIR}/nexcloudmariaDB/data:/var/lib/mysql:rw
       - ${USERDIR}/nexcloudmariaDB/data:/var/www/html/data:rw
     restart: unless-stopped
-
-  duplicati:
-    image: lscr.io/linuxserver/duplicati:latest
-    container_name: duplicati
-    environment:
-      - PUID=1000
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - CLI_ARGS= #optional
-    volumes:
-      - ${USERDIR}/duplicati/appdata/config:/config
-      - ${USERDIR}/duplicati/backups:/backups
-      - ${USERDIR}/duplicati/source:/source
-    ports:
-      - 8200:8200
-    restart: unless-stopped
-
-  # homeassistant:
-# https://iotechonline.com/home-assistant-install-with-docker-compose/
