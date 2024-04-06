@@ -43,12 +43,13 @@ services:
       ZIP_PASSWORD: 'PASSWORD'
       ZIP_TYPE: 'zip'
       BACKUP_KEEP_DAYS: 30
-      - PUID=1000
-      - PGID=${PGID}
-      - TZ=${TZ}
-      volumes:
+      PUID: 1000
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
       - ${USERDIR}/bw-data:/bitwarden/data/
       - ${USERDIR}/vaultwarden-backup/:/config/
+
 
   vaultwarden:
     container_name: vaultwarden
@@ -76,4 +77,4 @@ services:
   #     - TZ=${TZ}
   #   privileged: true
   #   image: tailscale/tailscale
-    entrypoint: tailscaled
+  # entrypoint: tailscaled
