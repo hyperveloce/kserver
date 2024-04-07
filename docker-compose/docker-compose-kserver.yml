@@ -1,54 +1,25 @@
 version: "3.3"
 services:
-  cloudflared:
-    hostname: cloudflared
-    container_name: cloudflared
-    image: cloudflare/cloudflared:latest
-    restart: 'always'
-    network_mode: host
-    environment:
-      - PUID=1000
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${USERDIR}/cloudflared/:/home/nonroot/.cloudflared/
-
-  adguard:
-    hostname: adguard
-    container_name: adguard
-    image: adguard/adguardhome:latest
-    user: '99'
-    #logging:
-    #    driver: none
-    volumes:
-      - ${USERDIR}/adguard:/opt/adguardhome/conf
+  adguardhome:
+    image: adguard/adguardhome
+    hostname: adguardhome
+    container_name: adguardhome
     ports:
-      - 53:5353/tcp
-      - 53:5353/udp
-      - 8088:8080
+      - 53:53/tcp
+      - 53:53/udp
+      - 784:784/udp
+      - 853:853/tcp
+      - 3000:3000/tcp
+      - 80:80/tcp
+      - 443:443/tcp
     environment:
       - PUID=1000
       - PGID=${PGID}
       - TZ=${TZ}
-    restart: 'always'
-
-  vaultwarden-backup:
-    image: ttionya/vaultwarden-backup:latest
-    container_name: vaultwarden-backup
-    hostname: vaultwarden-backup
-    restart: always
-    environment:
-      CRON: '00 03 * * *'
-      ZIP_ENABLE: 'TRUE'
-      ZIP_PASSWORD: 'PASSWORD'
-      ZIP_TYPE: 'zip'
-      BACKUP_KEEP_DAYS: 30
-      PUID: 1000
-      PGID: ${PGID}
-      TZ: ${TZ}
     volumes:
-      - ${USERDIR}/bw-data:/bitwarden/data/
-      - ${USERDIR}/vaultwarden-backup/:/config/
+      - ${USERDIR}/adguard/workdir:/opt/adguardhome/work
+      - ${USERDIR}/adguard/confdir:/opt/adguardhome/conf
+    restart: unless-stopped
 
 
   vaultwarden:
@@ -64,6 +35,24 @@ services:
       - TZ=${TZ}
     ports:
       - 1080:80
+
+  # vaultwarden-backup:
+  #   image: ttionya/vaultwarden-backup:latest
+  #   container_name: vaultwarden-backup
+  #   hostname: vaultwarden-backup
+  #   restart: always
+  #   environment:
+  #     CRON: '00 03 * * *'
+  #     ZIP_ENABLE: 'TRUE'
+  #     ZIP_PASSWORD: 'PASSWORD'
+  #     ZIP_TYPE: 'zip'
+  #     BACKUP_KEEP_DAYS: 30
+  #     PUID: 1000
+  #     PGID: ${PGID}
+  #     TZ: ${TZ}
+  #   volumes:
+  #     - ${USERDIR}/bw-data:/bitwarden/data/
+  #     - ${USERDIR}/vaultwarden-backup/:/config/
 
   # tailscale:
   #   container_name: tailscale
