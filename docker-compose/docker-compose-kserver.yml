@@ -11,7 +11,7 @@ services:
       - 853:853/tcp
       - 3001:3000/tcp
       - 8082:80/tcp
-      - 443:443/tcp
+      - 444:443/tcp
     environment:
       - PUID=1000
       - PGID=${PGID}
