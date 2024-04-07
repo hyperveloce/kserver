@@ -1,16 +1,17 @@
 version: "3.3"
 services:
-  nginx-proxy-manager:
-    container_name: nginx-pm
-    image: 'docker.io/jc21/nginx-proxy-manager:latest'
+  nginx:
+    image: nginx
+    container_name: nginx
     restart: unless-stopped
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - ${USERDIR}/nginx/data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - ${USERDIR}/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
