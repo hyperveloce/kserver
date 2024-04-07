@@ -33,7 +33,6 @@ services:
     environment:
       - WEBSOCKET_ENABLED=true
       - ROCKET_PORT=8001
-      - ROCKET_TLS=0
       - SIGNUPS_ALLOWED=true
       - SIGNUPS_VERIFY=false
       - INVITATIONS_ALLOWED=false
