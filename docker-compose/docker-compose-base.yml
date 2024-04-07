@@ -9,7 +9,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${USERDIR}/nginx:/etc/nginx
+      - ${USERDIR}/nginx/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
 
