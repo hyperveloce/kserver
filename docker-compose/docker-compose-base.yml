@@ -22,7 +22,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     ports:
-      - 443:3000
+      - 3000:3000
     volumes:
       - ${USERDIR}/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
