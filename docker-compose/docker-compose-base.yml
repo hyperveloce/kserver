@@ -10,7 +10,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${USERDIR}/nginx/vaultwarden.conf:/etc/nginx/conf.d/default.conf:ro
-      - ${USERDIR}/nginx/conf/:/etc/nginx/ssl/:ro
+      - ${USERDIR}/nginx/cert/:/etc/nginx/ssl/:ro
     ports:
       - 80:80
       - 443:443
