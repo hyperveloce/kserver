@@ -63,6 +63,24 @@ services:
   #     - ${USERDIR}/bw-data:/bitwarden/data/
   #     - ${USERDIR}/vaultwarden-backup/:/config/
 
+  # vaultwarden-backup:
+  #   image: ttionya/vaultwarden-backup:latest
+  #   container_name: vaultwarden-backup
+  #   hostname: vaultwarden-backup
+  #   restart: always
+  #   environment:
+  #     CRON: '00 03 * * *'
+  #     ZIP_ENABLE: 'TRUE'
+  #     ZIP_PASSWORD: 'PASSWORD'
+  #     ZIP_TYPE: 'zip'
+  #     BACKUP_KEEP_DAYS: 30
+  #     PUID: 1000
+  #     PGID: ${PGID}
+  #     TZ: ${TZ}
+  #   volumes:
+  #     - ${USERDIR}/bw-data:/bitwarden/data/
+  #     - ${USERDIR}/vaultwarden-backup/:/config/
+
   # tailscale:
   #   container_name: tailscale
   #   volumes:
@@ -75,4 +93,4 @@ services:
   #     - TZ=${TZ}
   #   privileged: true
   #   image: tailscale/tailscale
-  # entrypoint: tailscaled
+  #   entrypoint: tailscaled
