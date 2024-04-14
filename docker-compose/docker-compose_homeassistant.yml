@@ -47,9 +47,6 @@ services:
       - "1880:1880"
     volumes:
       - ${USERDIR}/nodered:/data
-    depends_on:
-      -
-      - eclipse-mosquitto
     environment:
       - PUID=1000
       - PGID=${PGID}
