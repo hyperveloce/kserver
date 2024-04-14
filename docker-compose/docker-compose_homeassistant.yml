@@ -11,14 +11,14 @@ services:
     restart: unless-stopped
     privileged: true
     depends_on:
-      - mariadb # MariaDB is optional (only if you would like to use a different database for HA).
-      - zigbee2mqtt  # zigbee2mqtt is optional (only if you want to add Zigbee devices and have a zigbee sniffer attached).
+      - hamariadb # MariaDB is optional (only if you would like to use a different database for HA).
+      # - zigbee2mqtt  # zigbee2mqtt is optional (only if you want to add Zigbee devices and have a zigbee sniffer attached).
       - eclipse-mosquitto # aka mosquitto-mqtt is optional (only if you want to add Zigbee devices and have a zigbee sniffer attached).
       - nodered
 
   # MariaDb
-  mariadb:
-    container_name: mariadb
+  hamariadb:
+    container_name: hamariadb
     image: mariadb:latest
     restart: unless-stopped
     environment:
@@ -29,7 +29,7 @@ services:
     user: "${LOCAL_USER}:${LOCAL_USER}"
     volumes:
       # Local path where the database will be stored.
-      - ./store/mariadb:/var/lib/mysql
+      - ${USERDIR}/hamariadb:/var/lib/mysql
 
   # eclipse-mosquitto (MQTT broker)
   eclipse-mosquitto:
