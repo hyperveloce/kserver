@@ -61,6 +61,15 @@ services:
       - 22000:22000/udp
       - 21027:21027/udp
     restart: unless-stopped
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    volumes:
+      - ${USERDIR}/uptime-kuma-data:/app/data
+    ports:
+      - 3001:3001  # <Host Port>:<Container Port>
+    restart: always
+    
   iperf:
     container_name: iperf
     image: networkstatic/iperf3
@@ -88,6 +97,37 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /var/run/docker.sock:/var/run/docker.sock
+  speedtest:
+    container_name: speedtest
+    image: henrywhitaker3/speedtest-tracker
+    ports:
+      - 8765:80
+    volumes:
+      - ${USERDIR}/data:/config
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - OOKLA_EULA_GDPR=true
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "200k"
+    restart: unless-stopped
+  glances:
+    container_name: glances
+    image: joweisberg/glances:latest
+    restart: unless-stopped
+    pid: host
+    ports:
+      - 61208:61208
+    environment:
+      - TZ=${TZ}
+      - GLANCES_OPT=--webserver
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${USERDIR}/glances:/glances/conf
 
   duplicati:
     image: lscr.io/linuxserver/duplicati:latest
@@ -104,3 +144,15 @@ services:
     ports:
       - 8200:8200
     restart: unless-stopped
+  duplicacy:
+    image: erichough/duplicacy
+    container_name: duplicacy
+    restart: always
+    ports:
+      - 3875:3875
+    cap_drop:
+      - ALL
+    volumes:
+      - ${USERDIR}/duplicacy/config/dir:/etc/duplicacy
+      - ${USERDIR}/duplicacy/cache:/var/cache/duplicacy
+      - ${USERDIR}/duplicacy/storage:/storage
