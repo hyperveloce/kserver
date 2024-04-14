@@ -43,19 +43,19 @@ services:
   #   volumes:
   #     - ${USERDIR}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   #
-  # # nodered
-  # nodered:
-  #   container_name: nodered
-  #   image: nodered/node-red
-  #   ports:
-  #     - "1880:1880"
-  #   volumes:
-  #     - ${USERDIR}/nodered:/data
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #   restart: unless-stopped
+  # nodered
+  nodered:
+    container_name: nodered
+    image: nodered/node-red
+    ports:
+      - "1880:1880"
+    volumes:
+      - ${USERDIR}/nodered:/data
+    environment:
+      - PUID=1000
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: unless-stopped
   #
 
   # # zigbee2mqtt
