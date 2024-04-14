@@ -36,7 +36,6 @@ services:
     container_name: eclipse-mosquitto
     image: eclipse-mosquitto:latest
     restart: unless-stopped
-    network_mode: host
     volumes:
       - ${USERDIR}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
@@ -49,7 +48,7 @@ services:
     volumes:
       - ${USERDIR}/nodered:/data
     depends_on:
-      - homeassistant
+      -
       - eclipse-mosquitto
     environment:
       - PUID=1000
