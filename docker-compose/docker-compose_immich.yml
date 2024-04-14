@@ -70,6 +70,6 @@ services:
       -  ${USERDIR}/immich/pgdata:/var/lib/postgresql/data
     restart: always
 
-volumes:
-  pgdata: ${USERDIR}/immich/pgdata
-  model-cache: ${USERDIR}/immich/model-cache
+# volumes:
+#   pgdata: ${USERDIR}/immich/pgdata
+#   model-cache: ${USERDIR}/immich/model-cache
