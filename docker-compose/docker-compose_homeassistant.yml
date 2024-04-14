@@ -50,7 +50,7 @@ services:
       - ${USERDIR}/nodered:/data
     depends_on:
       - homeassistant
-      - mosquitto
+      - eclipse-mosquitto
     environment:
       - PUID=1000
       - PGID=${PGID}
