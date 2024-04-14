@@ -9,7 +9,7 @@ services:
       - 53:53/udp
       - 784:784/udp
       - 853:853/tcp
-      - 3001:3000/tcp
+      - 3030:3000/tcp
       - 8082:80/tcp
       - 444:443/tcp
     environment:
@@ -20,7 +20,6 @@ services:
       - ${USERDIR}/adguard/workdir:/opt/adguardhome/work
       - ${USERDIR}/adguard/confdir:/opt/adguardhome/conf
     restart: unless-stopped
-
 
   vaultwarden:
     container_name: vaultwarden
@@ -80,17 +79,3 @@ services:
   #   volumes:
   #     - ${USERDIR}/bw-data:/bitwarden/data/
   #     - ${USERDIR}/vaultwarden-backup/:/config/
-
-  # tailscale:
-  #   container_name: tailscale
-  #   volumes:
-  #     - '/var/lib:/var/lib'
-  #     - '/dev/net/tun:/dev/net/tun'
-  #   network_mode: host
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-  #   privileged: true
-  #   image: tailscale/tailscale
-  #   entrypoint: tailscaled
