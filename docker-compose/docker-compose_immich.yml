@@ -19,8 +19,8 @@ services:
     ports:
       - 2283:3001
     depends_on:
-      - redis
-      - database
+      - immich_redis
+      - immich_postgres
     restart: always
 
   immich-microservices:
@@ -71,5 +71,5 @@ services:
     restart: always
 
 volumes:
-  pgdata: ${USERDIR}/immich/pgdata
-  model-cache: ${USERDIR}/immich/model-cache
+  pgdata: 
+  model-cache: 
