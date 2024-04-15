@@ -15,7 +15,7 @@ services:
       - ${USERDIR}/immich:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     env_file:
-      - .env
+      - .env 
     ports:
       - 2283:3001
     depends_on:
