@@ -31,7 +31,7 @@ services:
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     command: ['start.sh', 'microservices']
     volumes:
-      - ${USERDIR}/immich/upload:/usr/src/app/upload
+      - ${USERDIR}/immich:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
