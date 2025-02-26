@@ -1,3 +1,12 @@
+### Resolution setup
+sudo nano /etc/default/grub
+
+GRUB_GFXMODE=2560x1440
+GRUB_GFXPAYLOAD_LINUX=2560x1440
+GRUB_CMDLINE_LINUX="video=2560x1440"
+
+
+
 
 
 #monitor off
