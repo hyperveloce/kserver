@@ -52,6 +52,11 @@ bash scripts/setup.sh
 # Use nala
 bash scripts/usenala
 
+# Custoemr install
+wget https://github.com/jesseduffield/lazygit/releases/download/v0.38.1/lazygit_0.38.1_Linux_x86_64.tar.gz
+tar -xvf lazygit_0.38.1_Linux_x86_64.tar.gz
+sudo mv lazygit /usr/local/bin/
+
 sudo apt autoremove
 
 printf "\e[1;32mYour system is ready and will go for reboot! Thanks you.\e[0m\n"
