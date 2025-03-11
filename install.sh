@@ -44,7 +44,7 @@ chown -R $username:$username /home/$username
 apt install nala -y
 
 # Installing Essential Programs
-apt install x11-xserver-utils unzip wget build-essential git samba smbclient cifs-utils neofetch neovim rsync xserver-xorg xterm docker-compose net-tools curl -y
+apt install x11-xserver-utils unzip wget build-essential git samba smbclient cifs-utils neofetch neovim rsync xserver-xorg xterm docker-compose net-tools borgbackup -y
 
 # # Beautiful bash
 bash scripts/setup.sh
