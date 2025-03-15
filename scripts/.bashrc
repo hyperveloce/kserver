@@ -219,19 +219,18 @@ alias gfp='git fetch --prune'
 alias gclean='git clean -fd'
 
 # Docker commands
-# Git Aliases (simple & clean)
 alias dps='docker ps -a'  # List all containers
 alias dsto='docker stop'  # Stop a container
-alias dsta='docker start'  # Start a container
-alias dres='docker restart'  # Restart a container
-alias drem='docker rm'  # Remove a container
+alias dstt='docker start'  # Start a container
+alias drst='docker restart'  # Restart a container
+alias drm='docker rm'  # Remove a container
 alias drmi='docker rmi'  # Remove an image
-alias dlog='docker logs'  # View container logs
-alias dexe='docker exec -it'  # Run commands inside a container
-alias dbui='docker build'  # Build Docker images
-alias dimg='docker images'  # List Docker images
-alias dpul='docker pull'  # Pull an image
-alias dpus='docker push'  # Push an image
+alias dlo='docker logs'  # View container logs
+alias dex='docker exec -it'  # Run commands inside a container
+alias dbu='docker build'  # Build Docker images
+alias dim='docker images'  # List Docker images
+alias dpl='docker pull'  # Pull an image
+alias dpl='docker push'  # Push an image
 alias dcle='docker system prune -f'  # Clean unused Docker data
 
 # Search command line history
