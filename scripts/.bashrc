@@ -219,7 +219,7 @@ alias gfp='git fetch --prune'
 alias gclean='git clean -fd'
 
 # Docker commands
-alias dps='docker ps -a'  # List all containers
+alias dps='docker ps -a --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}"'  # List all containers
 alias dsto='docker stop'  # Stop a container
 alias dstt='docker start'  # Start a container
 alias drst='docker restart'  # Restart a container
