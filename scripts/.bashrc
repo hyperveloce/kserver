@@ -1,6 +1,6 @@
 #!/bin/bash
 iatest=$(expr index "$-" i)
-
+neofetch
 #######################################################
 # SOURCED ALIAS'S AND SCRIPTS BY zachbrowne.me
 #######################################################
