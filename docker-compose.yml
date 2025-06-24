@@ -1,0 +1,387 @@
+version: "3.8"
+
+services:
+  ### PROXY
+  nginx_pm:
+    image: "jc21/nginx-proxy-manager:latest"
+    container_name: nginx_pm
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81" # Admin interface
+      - "443:443"
+    environment:
+      DB_SQLITE_FILE: "/data/database.sqlite"
+    volumes:
+      - /srv/data/nginxpm_data:/data
+      - /srv/data/nginxpm_letsencrypt:/etc/letsencrypt
+    networks:
+      - app_network
+
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy
+    container_name: docker-socket-proxy
+    restart: unless-stopped
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      INFO: 1
+      STATS: 1
+      EVENTS: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "2375:2375" # Expose port to host
+    networks:
+      - app_network
+
+  ### DASHBOARD HOMARR
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - /srv/data/homepage_config:/app/config # Make sure your local config directory exists
+      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations, see alternative methods
+      - /home/kanasu:/home/kanasu:ro
+      - /srv/data:/srv/data:ro
+      - /mnt/asus/kserver_backup:/mnt/asus/kserver_backup:ro
+    env_file:
+      - .env
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: kserver.dna,home.dnaone.love,192.168.50.201:3000,localhost:3000,homepage:3000
+      HOMEPAGE_VAR_NPM_USER: ${NPM_USER}
+      HOMEPAGE_VAR_NPM_PASS: ${NPM_PASS}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    networks:
+      - app_network
+
+  ### CHATGPT
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    volumes:
+      - /srv/data/open-webui_data:/app/backend/data
+    environment:
+      - "OLLAMA_BASE_URL=http://192.168.50.203:11434"
+      - "WEBUI_SECRET_KEY="
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  ### NEXTCLOUD
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    environment:
+      NEXTCLOUD_ADMIN_USER: kanasu
+      NEXTCLOUD_ADMIN_PASSWORD: ${NC_ADMIN_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD} # Same as the DB password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_HOST: nc_db
+      REDIS_HOST: nc_redis
+      REDIS_HOST_PASSWORD: ${NC_REDIS_PASSWORD} # You can change this password
+      REDIS_PORT: 6379
+    volumes:
+      - /srv/data/nextcloud_data:/var/www/html/data # Bind mount for user data
+      - /srv/data/nextcloud_config:/var/www/html/config # Docker volume for config
+      - /srv/data/nextcloud_themes:/var/www/html/themes # Custom the
+    depends_on:
+      - nc_db
+      - nc_redis
+    networks:
+      - app_network
+
+  nc_db:
+    image: mariadb:10.6
+    container_name: nc_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Change this to a strong password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD} # Change this to a strong password
+    volumes:
+      - /srv/volume/nextclouddb_data:/var/lib/mysql
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  # Redis Service for Nextcloud Caching
+  nc_redis:
+    image: redis:alpine
+    container_name: nc_redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "redispassword"] # Set a password for Redis
+    networks:
+      - app_network
+    tmpfs:
+      - /data
+
+  ### HOMEASSISTANT
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    environment:
+      - TZ=Australia/Melbourne
+    volumes:
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/timezone:/etc/timezone:ro # Sync host timezone
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    # ports:
+    #   - "2283:2283"
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+    # Example tag: ${IMMICH_VERSION:-release}-cuda
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+    #   file: hwaccel.ml.yml
+    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    volumes:
+      - /srv/volume/im_model-cache:/cache
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      disable: false
+    networks:
+      - app_network
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/redis:6.2-alpine@sha256:148bb5411c184abd288d9aaed139c98123eeb8824c5d3fce03cf721db58066d8
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: unless-stopped
+    networks:
+      - app_network
+    tmpfs:
+      - /data:size=128m
+
+  postgres:
+    container_name: immich_postgres
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+    healthcheck:
+      test: >-
+        pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1;
+        Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align
+        --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')";
+        echo "checksum failure count is $$Chksum";
+        [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      # start_interval: 30s
+      start_period: 5m
+    command: >-
+      postgres
+      -c shared_preload_libraries=vectors.so
+      -c 'search_path="$$user", public, vectors'
+      -c logging_collector=on
+      -c max_wal_size=2GB
+      -c shared_buffers=512MB
+      -c wal_compression=on
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  ### HOMEASSISTANT
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:latest
+    restart: unless-stopped
+    volumes:
+      - /srv/data/homeassistant_config:/config
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - ha_mariadb
+    environment:
+      - TZ=Australia/Melbourne
+    networks:
+      - app_network
+
+  ha_mariadb:
+    container_name: ha_mariadb
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: homeassistant
+      MYSQL_USER: homeassistant
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - /srv/volume/homeassistantdb_data:/var/lib/mysql
+    networks:
+      - app_network
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=ha_mariadb
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - ha_mariadb
+    networks:
+      - app_network
+
+  ### MONITORING
+  beszel:
+    image: henrygd/beszel
+    container_name: beszel
+    restart: unless-stopped
+    # ports:
+    #   - "8090:8090"
+    volumes:
+      - /srv/data/beszel_data:/beszel_data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app_network
+    depends_on:
+      - docker-socket-proxy
+
+  beszel-agent:
+    image: "henrygd/beszel-agent"
+    container_name: "beszel-agent"
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # monitor other disks / partitions by mounting a folder in /extra-filesystems
+      # - /mnt/disk/.beszel:/extra-filesystems/sda1:ro
+    environment:
+      LISTEN: 45876
+      KEY: "${SSH_KEY}"
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    # ports:
+    #   - "8070:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=http://192.168.50.201:2375 # Use host IP for docker-socket-proxy
+      - DOZZLE_REMOTE_AGENT=192.168.50.200:7007
+    networks:
+      - app_network
+    depends_on:
+      - docker-socket-proxy
+
+  glances:
+    image: nicolargo/glances:latest
+    container_name: glances
+    restart: always
+    pid: "host"
+    privileged: true
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/srv/data/glances_data/glances.conf:/glances/conf/glances.conf"
+    ports:
+      - "61208:61208"
+    environment:
+      - GLANCES_ENABLE_SENSORS=true
+    networks:
+      - app_network
+    command: glances -C /glances/conf/glances.conf -w
+
+  speedtest-tracker:
+    image: henrywhitaker3/speedtest-tracker
+    container_name: speedtest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Australia/Melbourne
+      - OOKLA_EULA_GDPR=true
+    logging:
+        driver: "json-file"
+        options:
+            max-file: "10"
+            max-size: "200k"
+    volumes:
+      - /srv/data/speedtest_data:/config
+    # ports:
+    #   - 8765:80
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  pairdrop:
+    image: lscr.io/linuxserver/pairdrop:latest
+    container_name: pairdrop
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - RATE_LIMIT=false #optional
+      - WS_FALLBACK=false #optional
+      - RTC_CONFIG= #optional
+      - DEBUG_MODE=false #optional
+    # ports:
+    #   - 3005:3000
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  it_tools:
+    container_name: it_tools
+    image: corentinth/it-tools:latest
+    restart: unless-stopped
+    environment:
+      - TZ=Australia/Melbourne
+    volumes:
+      - /srv/data/it_tools_data:/app/data
+    networks:
+      - app_network
+
+  cloudflared:
+    container_name: cloudflared
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    volumes:
+      - /srv/data/cloudflared_config:/root/.cloudflared
+    command: tunnel --no-autoupdate run --no-tls-verify --token ${CLOUDFLARE_TOKEN}
+    networks:
+      - app_network
+
+# Volumes for persistent data
+volumes:
+  nextclouddb_data:
+    name: nextclouddb_data
+  immichdb_data:
+    name: immichdb_data
+  homeassistantdb_data:
+    name: homeassistantdb_data
+
+# Network for both containers to communicate
+networks:
+  app_network:
+    driver: bridge
+    external: true
