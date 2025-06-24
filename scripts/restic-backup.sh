@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # === CONFIGURATION ===
-ENV_FILE="/home/kanasu/git.hyperveloce/kserver/.env"
+ENV_FILE="../.env"
 LOG_FILE="/srv/data/log/restic-backup.log"
 BACKUP_MOUNT="/mnt/asus/kserver_backup"
 REPO_PATH="$BACKUP_MOUNT/restic-backups"
@@ -11,6 +11,10 @@ BACKUP_PATHS=("/srv/data")
 DB_BACKUP_DIR="/srv/data/db_backup"
 NEXTCLOUD_DB_DUMP="$DB_BACKUP_DIR/nextcloud.sql"
 IMMICH_DB_DUMP="$DB_BACKUP_DIR/immich_postgres.sql.gz"
+
+# # Fix permissions for backup
+# chown -R kanasu:kanasu /srv/data
+# chmod -R u+rwX /srv/data
 
 # === LOAD ENVIRONMENT VARIABLES ===
 if [ -f "$ENV_FILE" ]; then

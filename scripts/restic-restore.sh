@@ -5,8 +5,8 @@
 # === CONFIGURATION ===
 RESTIC_REPO="/mnt/asus/kserver_backup/restic-backups"
 RESTORE_TARGET="/srv/restic-restore"
-PASSWORD_FILE="/home/kanasu/restic-pw.txt"
-LOG_FILE="/srv/restic-backup.log"
+PASSWORD_FILE="../restic-pw.txt"
+LOG_FILE="/srv/restic-restore/restic-backup.log"
 
 # === CHECKS ===
 if [ ! -f "$PASSWORD_FILE" ]; then
