@@ -30,8 +30,8 @@ services:
       EVENTS: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "2375:2375" # Expose port to host
+    # ports:
+    #   - "2375:2375" # Expose port to host
     networks:
       - app_network
 
@@ -288,8 +288,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DOCKER_HOST=http://192.168.50.201:2375 # Use host IP for docker-socket-proxy
-      - DOZZLE_REMOTE_AGENT=piserver:7007
+      - DOCKER_HOST=http://docker-socket-proxy:2375 # Use host IP for docker-socket-proxy
+      - DOZZLE_REMOTE_AGENT=http://piserver:7007
     networks:
       - app_network
     depends_on:
