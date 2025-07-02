@@ -278,6 +278,7 @@ services:
     environment:
       LISTEN: 45876
       KEY: "${SSH_KEY}"
+      TZ: Australia/Sydney # Your timezone
 
   dozzle:
     image: amir20/dozzle:latest
@@ -290,6 +291,7 @@ services:
     environment:
       - DOCKER_HOST=http://docker-socket-proxy:2375
       - DOZZLE_REMOTE_HOST=tcp://piserver:2375
+      - TZ=Australia/Sydney # Your timezone
     networks:
       - app_network
     depends_on:
@@ -339,13 +341,32 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Australia/Sydney # Your timezone
       - RATE_LIMIT=false #optional
       - WS_FALLBACK=false #optional
       - RTC_CONFIG= #optional
       - DEBUG_MODE=false #optional
     # ports:
     #   - 3005:3000
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  syncthing:
+    image: linuxserver/syncthing
+    container_name: syncthing
+    ports:
+      - 8384:8384 # Web UI
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp # Local discovery
+    volumes:
+      - /srv/data/syncthing_config:/config
+      - /srv/data/syncthing_vault:/sync
+    environment:
+      - PUID=1000 # Get with `id -u`
+      - PGID=1000 # Get with `id -g`
+      - TZ=Australia/Sydney # Your timezone
     restart: unless-stopped
     networks:
       - app_network
