@@ -3,7 +3,7 @@ version: "3.8"
 services:
   ### PROXY
   nginx_pm:
-    image: "jc21/nginx-proxy-manager:latest"
+    image: "jc21/nginx-proxy-manager:github-uidgid"
     container_name: nginx_pm
     restart: unless-stopped
     ports:
