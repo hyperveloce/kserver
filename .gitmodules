@@ -1,0 +1,3 @@
+[submodule "homelab-bootstrap"]
+	path = homelab-bootstrap
+	url = https://github.com/hyperveloce/homelab-bootstrap.git
