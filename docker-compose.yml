@@ -19,7 +19,7 @@ services:
   #     - app_network
 
   caddy:
-    image: ghcr.io/caddyserver/caddy:latest-cloudflare
+    image: slothcroissant/caddy-cloudflaredns:latest
     container_name: caddy
     restart: unless-stopped
     ports:
@@ -31,7 +31,8 @@ services:
       - /srv/data/caddy/data:/data
       - /srv/data/caddy/config:/config
     environment:
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_TOKEN}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - /srv/data/secrets.env
     networks:
       - app_network
 
