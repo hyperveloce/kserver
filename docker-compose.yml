@@ -2,19 +2,36 @@ version: "3.8"
 
 services:
   ### PROXY
-  nginx_pm:
-    image: "jc21/nginx-proxy-manager:2.12.3"
-    container_name: nginx_pm
+  # nginx_pm:
+  #   image: "jc21/nginx-proxy-manager:2.12.3"
+  #   container_name: nginx_pm
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "81:81" # Admin interface
+  #     - "443:443"
+  #   environment:
+  #     DB_SQLITE_FILE: "/data/database.sqlite"
+  #   volumes:
+  #     - /srv/data/nginxpm_data:/data
+  #     - /srv/data/nginxpm_letsencrypt:/etc/letsencrypt
+  #   networks:
+  #     - app_network
+
+  caddy:
+    image: ghcr.io/caddyserver/caddy:latest-cloudflare
+    container_name: caddy
     restart: unless-stopped
     ports:
       - "80:80"
-      - "81:81" # Admin interface
       - "443:443"
-    environment:
-      DB_SQLITE_FILE: "/data/database.sqlite"
+      - "443:443/udp"
     volumes:
-      - /srv/data/nginxpm_data:/data
-      - /srv/data/nginxpm_letsencrypt:/etc/letsencrypt
+      - /srv/data/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /srv/data/caddy/data:/data
+      - /srv/data/caddy/config:/config
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_TOKEN}
     networks:
       - app_network
 
