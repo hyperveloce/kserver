@@ -215,18 +215,67 @@ services:
     networks:
       - app_network
 
-  # ── AI ───────────────────────────────────────────────────────────────────────
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
+  # ── ODYSSEUS AI WORKSPACE ────────────────────────────────────────────────────
+  odysseus:
+    image: ghcr.io/pewdiepie-archdaemon/odysseus:latest
+    container_name: odysseus
     restart: unless-stopped
     environment:
-      - OLLAMA_BASE_URL=http://192.168.50.203:11434
-      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
-    extra_hosts:
-      - host.docker.internal:host-gateway
+      - APP_BIND=0.0.0.0
+      - APP_PORT=7000
+      - SECURE_COOKIES=true
+      - LOCALHOST_BYPASS=false
+      - AUTH_ENABLED=true
+      - OLLAMA_HOST=http://192.168.50.203:11434
+      - CHROMADB_HOST=chromadb
+      - ODYSSEUS_ADMIN_USER=kanasu
     volumes:
-      - /srv/data/open-webui_data:/app/backend/data
+      - /srv/data/odysseus_data:/app/data
+    depends_on:
+      - chromadb
+      - searxng
+    networks:
+      - app_network
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: chromadb
+    restart: unless-stopped
+    environment:
+      - ANONYMIZED_TELEMETRY=FALSE
+    volumes:
+      - /srv/data/chromadb_data:/chroma/chroma
+    networks:
+      - app_network
+
+  searxng:
+    image: searxng/searxng:2026.5.31-7159b8aed
+    container_name: searxng
+    restart: unless-stopped
+    volumes:
+      - /srv/data/searxng_config:/etc/searxng
+    networks:
+      - app_network
+
+  # ── FRIGATE NVR ──────────────────────────────────────────────────────────────
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    restart: unless-stopped
+    privileged: true
+    shm_size: "128mb"
+    volumes:
+      - /srv/data/frigate_config:/config
+      - /srv/data/frigate_media:/media/frigate
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - FRIGATE_RTSP_PASSWORD=${FRIGATE_RTSP_PASSWORD}
+      - TZ=Australia/Melbourne
+    ports:
+      - "5000:5000"
+      - "8554:8554"
+      - "8555:8555/tcp"
+      - "8555:8555/udp"
     networks:
       - app_network
 
