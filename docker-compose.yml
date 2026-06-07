@@ -244,6 +244,8 @@ services:
     image: ollama/ollama:latest
     container_name: ollama
     restart: unless-stopped
+    ports:
+      - "11434:11434"
     volumes:
       - /srv/data/ollama_data:/root/.ollama
     networks:
