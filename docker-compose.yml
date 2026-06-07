@@ -221,7 +221,9 @@ services:
     container_name: frigate
     restart: unless-stopped
     privileged: true
-    shm_size: "128mb"
+    shm_size: "256mb"
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
     volumes:
       - /srv/data/frigate_config:/config
       - /srv/data/frigate_media:/media/frigate
