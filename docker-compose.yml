@@ -239,6 +239,16 @@ services:
     networks:
       - app_network
 
+  # ── OLLAMA (always-on, kserver CPU) ─────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - /srv/data/ollama_data:/root/.ollama
+    networks:
+      - app_network
+
   # ── MONITORING ──────────────────────────────────────────────────────────────
   beszel:
     image: henrygd/beszel
