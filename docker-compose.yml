@@ -215,48 +215,6 @@ services:
     networks:
       - app_network
 
-  # ── ODYSSEUS AI WORKSPACE ────────────────────────────────────────────────────
-  odysseus:
-    image: ghcr.io/pewdiepie-archdaemon/odysseus:latest
-    container_name: odysseus
-    restart: unless-stopped
-    environment:
-      - APP_BIND=0.0.0.0
-      - APP_PORT=7000
-      - SECURE_COOKIES=true
-      - LOCALHOST_BYPASS=false
-      - AUTH_ENABLED=true
-      - OLLAMA_HOST=http://192.168.50.203:11434
-      - CHROMADB_HOST=chromadb
-      - ODYSSEUS_ADMIN_USER=kanasu
-    volumes:
-      - /srv/data/odysseus_data:/app/data
-    depends_on:
-      - chromadb
-      - searxng
-    networks:
-      - app_network
-
-  chromadb:
-    image: chromadb/chroma:latest
-    container_name: chromadb
-    restart: unless-stopped
-    environment:
-      - ANONYMIZED_TELEMETRY=FALSE
-    volumes:
-      - /srv/data/chromadb_data:/chroma/chroma
-    networks:
-      - app_network
-
-  searxng:
-    image: searxng/searxng:2026.5.31-7159b8aed
-    container_name: searxng
-    restart: unless-stopped
-    volumes:
-      - /srv/data/searxng_config:/etc/searxng
-    networks:
-      - app_network
-
   # ── FRIGATE NVR ──────────────────────────────────────────────────────────────
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
