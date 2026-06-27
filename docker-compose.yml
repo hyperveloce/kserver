@@ -176,6 +176,7 @@ services:
     image: ghcr.io/home-assistant/home-assistant:latest
     container_name: homeassistant
     restart: unless-stopped
+    network_mode: host
     environment:
       - TZ=Australia/Melbourne
     volumes:
@@ -183,8 +184,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - ha_mariadb
-    networks:
-      - app_network
 
   ha_mariadb:
     image: mariadb:latest
