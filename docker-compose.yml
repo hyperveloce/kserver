@@ -94,22 +94,23 @@ services:
 
   # ── MEDIA & FILES ───────────────────────────────────────────────────────────
   immich-server:
-    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    container_name: immich_server
-    restart: unless-stopped
-    environment:
-      - TZ=Australia/Melbourne
-    volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /etc/localtime:/etc/localtime:ro
-    env_file:
-      - .env
-    depends_on:
-      - immich-machine-learning
-      - redis
-      - postgres
-    networks:
-      - app_network
+      image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+      container_name: immich_server
+      restart: unless-stopped
+      environment:
+        - TZ=Australia/Melbourne
+      volumes:
+        - ${UPLOAD_LOCATION}:/usr/src/app/upload
+        - /srv/dna-library/photos-videos:/photos-videos:ro
+        - /etc/localtime:/etc/localtime:ro
+      env_file:
+        - .env
+      depends_on:
+        - immich-machine-learning
+        - redis
+        - postgres
+      networks:
+        - app_network
 
   immich-machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
@@ -139,7 +140,7 @@ services:
       REDIS_HOST_PASSWORD: ${NC_REDIS_PASSWORD}
       REDIS_PORT: 6379
     volumes:
-      - /srv/data/nextcloud_data:/var/www/html/data
+      - /srv/dna-library/nextcloud-data:/var/www/html/data
       - /srv/data/nextcloud_config:/var/www/html/config
       - /srv/data/nextcloud_themes:/var/www/html/themes
     depends_on:
