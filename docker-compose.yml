@@ -116,6 +116,10 @@ services:
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
     container_name: immich_machine_learning
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
     volumes:
       - /srv/volume/im_model-cache:/cache
     env_file:
@@ -224,6 +228,10 @@ services:
     restart: unless-stopped
     privileged: true
     shm_size: "256mb"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
     volumes:
