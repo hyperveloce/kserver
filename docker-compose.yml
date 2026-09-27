@@ -111,7 +111,8 @@ services:
         - postgres
       networks:
         - app_network
-
+      devices:
+        - /dev/dri:/dev/dri
   immich-machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
     container_name: immich_machine_learning
