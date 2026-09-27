@@ -114,7 +114,7 @@ services:
       devices:
         - /dev/dri:/dev/dri
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}-openvino
     container_name: immich_machine_learning
     restart: unless-stopped
     deploy:
@@ -129,8 +129,9 @@ services:
       disable: false
     networks:
       - app_network
-    devices:
-      - /dev/dri:/dev/dri
+    extends:
+      file: hwaccel.ml.yml
+      service: openvino
 
   nextcloud:
     image: nextcloud:latest
