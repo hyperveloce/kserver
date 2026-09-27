@@ -129,6 +129,8 @@ services:
       disable: false
     networks:
       - app_network
+    devices:
+      - /dev/dri:/dev/dri
 
   nextcloud:
     image: nextcloud:latest
