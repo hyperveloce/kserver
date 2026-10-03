@@ -63,7 +63,7 @@ echo "===== IMMICH ====="
 
 for CONTAINER in immich_server immich_machine_learning immich_postgres immich_redis
 do
-    STATUS=$(docker inspect --format '{{.Status}}' "$CONTAINER" 2>/dev/null)
+    STATUS=$(docker inspect --format '{{.State.Status}}' "$CONTAINER" 2>/dev/null)
 
     if [ "$STATUS" = "running" ]; then
         echo "OK: $CONTAINER is running"
@@ -87,7 +87,7 @@ do
         AGE=$((NOW - LAST))
         AGE_DAYS=$((AGE / 86400))
 
-        if [ "$AGE" -le 8 ]; then
+        if [ "$AGE" -le $((8 * 86400)) ]; then
             echo "OK: $NAME backup is recent (${AGE_DAYS} days old)"
         else
             echo "WARNING: $NAME backup is ${AGE_DAYS} days old"
