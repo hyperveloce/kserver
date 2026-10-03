@@ -1,0 +1,110 @@
+#!/bin/bash
+
+echo "========================================"
+echo " KSERVER HEALTH CHECK"
+echo " $(date)"
+echo "========================================"
+
+echo
+echo "===== SYSTEM ====="
+
+echo "--- Uptime ---"
+uptime
+
+echo
+echo "--- Failed systemd services ---"
+FAILED=$(systemctl --failed --no-legend --no-pager)
+
+if [ -z "$FAILED" ]; then
+    echo "OK: No failed services"
+else
+    echo "WARNING: Failed services found"
+    echo "$FAILED"
+fi
+
+echo
+echo "--- Disk space ---"
+df -h / /srv
+
+echo
+echo "--- Memory ---"
+free -h
+
+echo
+echo "--- Swap ---"
+swapon --show
+
+echo
+echo "===== DOCKER ====="
+
+if systemctl is-active --quiet docker; then
+    echo "OK: Docker service is running"
+else
+    echo "WARNING: Docker service is NOT running"
+fi
+
+echo
+echo "--- Containers ---"
+docker ps --format "table {{.Names}}\t{{.Status}}"
+
+echo
+echo "--- Containers not running ---"
+NOT_RUNNING=$(docker ps -a --filter "status=exited" --format "{{.Names}}")
+
+if [ -z "$NOT_RUNNING" ]; then
+    echo "OK: No exited containers"
+else
+    echo "INFO: Exited containers:"
+    echo "$NOT_RUNNING"
+fi
+
+echo
+echo "===== IMMICH ====="
+
+for CONTAINER in immich_server immich_machine_learning immich_postgres immich_redis
+do
+    STATUS=$(docker inspect --format '{{.Status}}' "$CONTAINER" 2>/dev/null)
+
+    if [ "$STATUS" = "running" ]; then
+        echo "OK: $CONTAINER is running"
+    else
+        echo "WARNING: $CONTAINER status: ${STATUS:-NOT FOUND}"
+    fi
+done
+
+echo
+echo "===== BACKUPS ====="
+
+for NAME in photos storage-files nas
+do
+    FILE="/var/lib/kserver-backups/${NAME}.last-success"
+
+    if [ ! -f "$FILE" ]; then
+        echo "WARNING: No success marker for $NAME"
+    else
+        LAST=$(stat -c %Y "$FILE")
+        NOW=$(date +%s)
+        AGE=$((NOW - LAST))
+        AGE_DAYS=$((AGE / 86400))
+
+        if [ "$AGE" -le 8 ]; then
+            echo "OK: $NAME backup is recent (${AGE_DAYS} days old)"
+        else
+            echo "WARNING: $NAME backup is ${AGE_DAYS} days old"
+        fi
+    fi
+done
+
+echo
+echo "--- Backup watchdog ---"
+
+if [ -f /var/log/kserver-backup-watchdog.log ]; then
+    tail -5 /var/log/kserver-backup-watchdog.log
+else
+    echo "INFO: Watchdog log does not exist yet"
+fi
+
+echo
+echo "========================================"
+echo " KSERVER HEALTH CHECK COMPLETE"
+echo "========================================"
