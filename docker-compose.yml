@@ -30,9 +30,9 @@ services:
       - "443:443"
       - "443:443/udp"
     volumes:
-      - /srv/data/caddy_data/Caddyfile:/etc/caddy/Caddyfile
-      - /srv/data/caddy_data:/data
-      - /srv/data/caddy_config:/config
+      - /srv/appdata/caddy_data/Caddyfile:/etc/caddy/Caddyfile
+      - /srv/appdata/caddy_data:/data
+      - /srv/appdata/caddy_config:/config
     env_file:
       - /srv/data/secrets.env
     networks:
@@ -45,7 +45,7 @@ services:
     restart: unless-stopped
     command: tunnel --no-autoupdate run --no-tls-verify --token ${CLOUDFLARE_TOKEN}
     volumes:
-      - /srv/data/cloudflared_config:/root/.cloudflared
+      - /srv/appdata/cloudflared_config:/root/.cloudflared
     networks:
       - app_network
 
@@ -73,10 +73,10 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - /srv/data/homepage_config:/app/config
+      - /srv/appdata/homepage_config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/kanasu:/home/kanasu:ro
-      - /srv/data:/srv/data:ro
+      - /srv/appdata:/srv/appdata:ro
       - /mnt/asus/kserver_backup:/mnt/asus/kserver_backup:ro
     env_file:
       - .env
@@ -121,7 +121,7 @@ services:
         limits:
           memory: 4G
     volumes:
-      - /srv/volume/im_model-cache:/cache
+      - /srv/cache/im_model-cache:/cache
     env_file:
       - .env
     healthcheck:
@@ -148,8 +148,8 @@ services:
       REDIS_PORT: 6379
     volumes:
       - /srv/dna-library/nextcloud-data:/var/www/html/data
-      - /srv/data/nextcloud_config:/var/www/html/config
-      - /srv/data/nextcloud_themes:/var/www/html/themes
+      - /srv/appdata/nextcloud_config:/var/www/html/config
+      - /srv/appdata/nextcloud_themes:/var/www/html/themes
     depends_on:
       - nc_db
       - nc_redis
@@ -166,7 +166,7 @@ services:
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - /srv/volume/nextclouddb_data:/var/lib/mysql
+      - /srv/databases/nextclouddb_data:/var/lib/mysql
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     networks:
       - app_network
@@ -190,7 +190,7 @@ services:
     environment:
       - TZ=Australia/Melbourne
     volumes:
-      - /srv/data/homeassistant_config:/config
+      - /srv/appdata/homeassistant_config:/config
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - ha_mariadb
@@ -205,7 +205,7 @@ services:
       MYSQL_USER: homeassistant
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - /srv/volume/homeassistantdb_data:/var/lib/mysql
+      - /srv/databases/homeassistantdb_data:/var/lib/mysql
     networks:
       - app_network
 
@@ -260,7 +260,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - /srv/data/ollama_data:/root/.ollama
+      - /srv/appdata/ollama_data:/root/.ollama
     networks:
       - app_network
 
@@ -270,7 +270,7 @@ services:
     container_name: beszel
     restart: unless-stopped
     volumes:
-      - /srv/data/beszel_data:/beszel_data
+      - /srv/appdata/beszel_data:/beszel_data
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -295,7 +295,7 @@ services:
     container_name: uptime-kuma
     restart: unless-stopped
     volumes:
-      - /srv/data/uptime_kuma_data:/app/data
+      - /srv/appdata/uptime_kuma_data:/app/data
     networks:
       - app_network
 
@@ -323,7 +323,7 @@ services:
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /srv/data/glances_data/glances.conf:/glances/conf/glances.conf
+      - /srv/appdata/glances_data/glances.conf:/glances/conf/glances.conf
     ports:
       - "61208:61208"
     environment:
@@ -348,7 +348,7 @@ services:
         max-file: "10"
         max-size: "200k"
     volumes:
-      - /srv/data/speedtest_data:/config
+      - /srv/appdata/speedtest_data:/config
     networks:
       - app_network
 
@@ -360,7 +360,7 @@ services:
     environment:
       - TZ=Australia/Melbourne
     volumes:
-      - /srv/data/it_tools_data:/app/data
+      - /srv/appdata/it_tools_data:/app/data
     networks:
       - app_network
 
@@ -387,8 +387,8 @@ services:
       - "22000:22000/udp"
       - "21027:21027/udp"
     volumes:
-      - /srv/data/syncthing_config:/config
-      - /srv/data/syncthing_vault:/sync
+      - /srv/appdata/syncthing_config:/config
+      - /srv/appdata/syncthing_vault:/sync
     environment:
       - PUID=1000
       - PGID=1000
