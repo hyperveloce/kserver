@@ -1,0 +1,15 @@
+# KServer root cron jobs
+#
+# Restore with:
+#   sudo crontab docs/kserver-crontab.txt
+
+# Sunday backups
+0 2 * * 0 /usr/local/bin/kserver.backup-photos.sh
+0 3 * * 0 /usr/local/bin/kserver.backup-storage-files.sh
+0 4 * * 0 /usr/local/bin/kserver.backup-to-nas.sh
+
+# Daily backup watchdog
+0 10 * * * /usr/local/bin/kserver.check-backups.sh
+
+# Monthly Docker cleanup
+0 5 1 * * /usr/local/bin/kserver.docker-cleanup.sh
