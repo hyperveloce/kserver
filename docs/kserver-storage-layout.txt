@@ -1,0 +1,73 @@
+# KServer storage layout
+
+## Filesystems
+
+/srv
+- Device: /dev/nvme0n1p4
+- Filesystem: ext4
+- Size: approximately 167G
+- Purpose: KServer application storage
+- Mount options: defaults,nofail
+
+/srv/dna-library
+- Device: /dev/sdb1
+- Filesystem: ext4
+- Size: approximately 1.8T
+- Purpose: Main user/application data
+- Mount options: defaults,noatime,nofail
+
+/srv/dna-backup
+- Device: /dev/sda1
+- Filesystem: ext4
+- Size: approximately 1.8T
+- Purpose: Local backup storage
+- Mount options: defaults,noatime,nofail
+
+## KServer directory structure
+
+/srv/docker-data
+- Docker Engine data root
+- Do not manually modify or move
+
+/srv/appdata
+- Persistent application configuration/state
+- Backed up to NAS
+
+/srv/databases
+- Live database storage
+- Backed up to NAS
+- Database dumps are also maintained separately
+
+/srv/cache
+- Rebuildable application caches
+- Not included in normal backup strategy
+
+/srv/dna-library
+- Critical user/application data
+- Includes Immich and Nextcloud data
+- Backed up to NAS
+
+/srv/dna-backup
+- Local backup disk
+- Currently mostly empty
+
+## Current disk usage
+
+At the time this document was created:
+
+/srv             167G total, 99G used, 60G available (63%)
+/srv/dna-library 1.8T total, 1.1T used, 709G available (60%)
+/srv/dna-backup   1.8T total, 28K used, 1.7T available (1%)
+
+## Important
+
+Do not delete or move mounted filesystems based solely on this document.
+Verify the current mounts with:
+
+    findmnt /srv
+    findmnt /srv/dna-library
+    findmnt /srv/dna-backup
+
+Verify current disk usage with:
+
+    df -h /srv /srv/dna-library /srv/dna-backup
