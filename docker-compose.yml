@@ -14,9 +14,6 @@ volumes:
     name: nextclouddb_data
   immichdb_data:
     name: immichdb_data
-  homeassistantdb_data:
-    name: homeassistantdb_data
-
 services:
   # ── REVERSE PROXY ───────────────────────────────────────────────────────────
   caddy:
@@ -192,35 +189,17 @@ services:
     volumes:
       - /srv/appdata/homeassistant_config:/config
       - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - ha_mariadb
-
-  ha_mariadb:
-    image: mariadb:latest
-    container_name: ha_mariadb
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: homeassistant
-      MYSQL_USER: homeassistant
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - /srv/databases/homeassistantdb_data:/var/lib/mysql
-    networks:
-      - app_network
-
   # ── DATABASE ADMIN ──────────────────────────────────────────────────────────
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     restart: unless-stopped
     environment:
-      PMA_HOSTS: nc_db,ha_mariadb
+      PMA_HOSTS: nc_db
       PMA_USER: root
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     depends_on:
       - nc_db
-      - ha_mariadb
     networks:
       - app_network
 
