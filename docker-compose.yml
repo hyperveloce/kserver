@@ -218,10 +218,12 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128
     volumes:
       - /srv/data/frigate_config:/config
-      - /srv/data/frigate_media:/media/frigate
+      - /srv/frigate:/media/frigate
+      - /srv/dna-backup/camera-recordings:/media/frigate/recordings
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - FRIGATE_RTSP_PASSWORD=${FRIGATE_RTSP_PASSWORD}
+      - FRIGATE_FRONT_PASSWORD=${FRIGATE_FRONT_PASSWORD}
+      - FRIGATE_SIDE_PASSWORD=${FRIGATE_SIDE_PASSWORD}
       - TZ=Australia/Melbourne
     ports:
       - "5000:5000"
